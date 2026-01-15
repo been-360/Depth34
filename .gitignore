@@ -205,3 +205,38 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Zephyr source
+zephyr/
+
+# Modules fetched by west
+modules/
+
+# Bootloader build artifacts
+bootloader/**/*.elf
+bootloader/**/*.bin
+bootloader/**/*.hex
+bootloader/**/build/
+
+# Python caches
+tools/__pycache__/
+tools/**/*.pyc
+
+# Python virtual environment
+.venv/
+
+# Editor / IDE files
+.vscode/
+.idea/
+*.swp
+*.bak
+*.tmp
+
+# Zephyr modules fetched by West
+controller/modules/*
+
+# Zephyr SDK (binary heavy)
+zephyr-sdk/
+
+# Virtual environment
+.venv/

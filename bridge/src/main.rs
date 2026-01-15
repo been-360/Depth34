@@ -1,31 +1,54 @@
 mod arduino;
 
-use gilrs::{Button, Event, Gilrs};
+use gilrs::{Button, EventType, Gilrs};
+use arduino::ArduinoBridge;
 
 fn main() {
-    let mut gil = Gilrs::new().unwrap();
-    let mut active = None;
+    let path = "/dev/ttyACM0";
+    let baud = 115200;
 
+    let mut gil = Gilrs::new().unwrap();
+    let bridge = ArduinoBridge::new(path, baud);
+    
     for (_id, gamepad) in gil.gamepads() {
         println!("{} is {:?}", gamepad.name(), gamepad.power_info());
     }
 
-    loop {
-        while let Some(Event {
-            id, event, time, ..
-        }) = gil.next_event()
-        {
-            println!("{:?} New event from {}: {:?}", time, id, event);
-            active = Some(id);
-        }
 
-        if let Some(gamepad) = active.map(|id| gil.gamepad(id)) {
-            if gamepad.is_pressed(Button::South) {
-                println!("Button South is pressed");
-            }
-        if gamepad.is_pressed(Button::North) {
-                println!("Button North is pressed");
+    loop {
+        while let Some(e) = gil.next_event() {
+            match e.event {
+                EventType::ButtonPressed(button, _) => match button {
+                    Button::South => println!("South"),
+                    Button::North => println!("North"),
+                    Button::East => println!("East"),
+                    Button::West => println!("West"),
+                    _ => {}
+                },
+
+                EventType::ButtonReleased(button, _) => match button {
+                    Button::South => println!("South Release"),
+                    Button::North => println!("North Release"),
+                    Button::East => println!("East Release"),
+                    Button::West => println!("West Release"),
+                    _ => {}
+                }
+
+                _ => {}
             }
         }
     }
 }
+
+/*
+loop {
+    while let Some(Event { id, event, time, .. }) = gil.next_event() {
+        active = Some(id);
+    }
+
+    if let Some(gamepad) = active.map(|id| gil.gamepad(id)) {
+
+    }
+
+}
+*/
