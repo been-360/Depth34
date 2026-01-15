@@ -1,5 +1,5 @@
 use serialport::SerialPort;
-use std::time::Duration;
+use std::{io, time::Duration};
 
 pub struct ArduinoBridge {
     port: Box<dyn SerialPort>,
@@ -14,5 +14,12 @@ impl ArduinoBridge {
             .expect("Connecting not work");
 
         ArduinoBridge { port }
+    }
+
+    pub fn send_data(&mut self, data: &str) -> io::Result<()> {
+        self.port.write_all(data.as_bytes())?;
+        self.port.write_all(b"\n")?; 
+        self.port.flush()?;
+        Ok(())
     }
 }

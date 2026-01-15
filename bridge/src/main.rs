@@ -8,8 +8,10 @@ fn main() {
     let baud = 115200;
 
     let mut gil = Gilrs::new().unwrap();
-    let bridge = ArduinoBridge::new(path, baud);
+    let mut bridge = ArduinoBridge::new(path, baud);
     
+    bridge.send_data("Hello Arduino!\n").unwrap();
+
     for (_id, gamepad) in gil.gamepads() {
         println!("{} is {:?}", gamepad.name(), gamepad.power_info());
     }
