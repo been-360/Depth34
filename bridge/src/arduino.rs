@@ -16,10 +16,13 @@ impl ArduinoBridge {
         ArduinoBridge { port }
     }
 
-    pub fn send_data(&mut self, data: &str) -> io::Result<()> {
-        self.port.write_all(data.as_bytes())?;
-        self.port.write_all(b"\n")?; 
+    pub fn send_button(&mut self, button: u8) -> io::Result<()> {
+        self.port.write_all(&button.to_be_bytes())?;
         self.port.flush()?;
         Ok(())
+    }
+
+    pub fn send_joystick(&mut self, axis: char, ) {
+
     }
 }
