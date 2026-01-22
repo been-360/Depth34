@@ -1,6 +1,6 @@
 mod bridge;
 
-use gilrs::{Button, EventType, Gilrs};
+use gilrs::{Button, EventType, Gilrs, Axis};
 use bridge::Bridge;
 
 fn main() {
@@ -19,6 +19,14 @@ fn main() {
                     Button::East => println!("Press E"),
                     Button::South => println!("Press S"),
                     Button::West => println!("Press W"),
+                    _ => {}
+                }
+
+                EventType::AxisChanged(axis, _, _) => match axis {
+                    Axis::LeftStickX => {}
+                    Axis::LeftStickY => {}
+                    Axis::RightStickX => {}
+                    Axis::RightStickY => {}
                     _ => {}
                 }
 
