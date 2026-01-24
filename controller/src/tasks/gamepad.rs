@@ -3,7 +3,7 @@ use std::time::Duration;
 use tokio::sync::watch;
 use gilrs::{Axis, Button, EventType, Gilrs};
 
-use crate::state::{L, R, State};
+use crate::{logs::red, state::{L, R, State}};
 
 pub fn gamepad_loop(sender: watch::Sender<State>) {
     let mut axes = std::collections::HashMap::new();
@@ -52,7 +52,7 @@ pub fn gamepad_loop(sender: watch::Sender<State>) {
                     };
 
                     if sender.send(state).is_err() {
-                        print!("");
+                        eprintln!("{}", red("An error occured while updating the state"));
                     }
                 }
 
