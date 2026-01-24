@@ -1,8 +1,11 @@
 use std::time::Duration;
 
+use tokio::sync::watch;
 use gilrs::{Axis, Button, EventType, Gilrs};
 
-pub fn gamepad_loop() {
+use crate::state::{L, R, State};
+
+pub fn gamepad_loop(sender: watch::Sender<State>) {
     let mut axes = std::collections::HashMap::new();
     let mut gil = Gilrs::new().unwrap();
 
@@ -43,10 +46,14 @@ pub fn gamepad_loop() {
                     let rx = *axes.get(&Axis::RightStickX).unwrap_or(&0.0);
                     let ry = *axes.get(&Axis::RightStickY).unwrap_or(&0.0);
 
-                    println!(
-                        "Left: ({:.2}, {:.2})  Right: ({:.2}, {:.2})",
-                        lx, ly, rx, ry
-                    );
+                    let state = State {
+                        l: L { lx, ly },
+                        r: R { rx, ry },
+                    };
+
+                    if sender.send(state).is_err() {
+                        print!("");
+                    }
                 }
 
                 _ => {}
