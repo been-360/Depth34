@@ -1,0 +1,9 @@
+@font-face {
+    font-family: "Varela";
+    font-weight: 400;
+    src: url("./assets/varela.woff") format("woff");
+}
+
+.varela {
+    font-family: "Varela", sans-serif;
+}

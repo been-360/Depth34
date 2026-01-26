@@ -4,12 +4,17 @@ mod state;
 mod tasks;
 
 use crate::{
-    logs::{green, yellow}, state::get_default_state, tasks::pwm::{Pwm, pwm_loop}
+    logs::{green, yellow},
+    state::get_default_state,
+    tasks::pwm::{Pwm, pwm_loop},
 };
 
-use std::io::{self, Read};
+use std::{
+    io::{self, Read},
+    time::Duration,
+};
 use tasks::gamepad::gamepad_loop;
-use tokio::{signal, spawn, sync::watch, task};
+use tokio::{spawn, sync::watch, task};
 
 #[tokio::main]
 async fn main() {
@@ -18,6 +23,8 @@ async fn main() {
 
     let pwm = Pwm::new().await;
     pwm.init().await;
+
+    pigpio::servo(13, 1700);
 
     let state = get_default_state().await;
     let (sender, reciever) = watch::channel(state);
@@ -44,10 +51,10 @@ fn handle_shutdown(
     pwm_task: tokio::task::JoinHandle<()>,
 ) {
     println!("\n {}", yellow("Quitting ROV controller..."));
-    
+
     pigpio::terminate();
     println!("\n {}", green("PiGPIO terminated"));
-    
+
     gamepad_task.abort();
     println!("\n {}", green("Gamepad loop terminated"));
 

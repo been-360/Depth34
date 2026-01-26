@@ -13,7 +13,3 @@ pub fn yellow(text: &str) -> String {
 pub fn cyan(text: &str) -> String {
     format!("\x1b[36m{}\x1b[0m", text)
 }
-
-pub fn blue(text: &str) -> String {
-    format!("\x1b[34m{}\x1b[0m", text)
-}

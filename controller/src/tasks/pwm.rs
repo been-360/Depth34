@@ -2,9 +2,10 @@ use tokio::sync::watch;
 
 use crate::logs::{cyan, green, red, yellow};
 use crate::pigpio;
-use crate::pigpio::servo;
+use crate::pigpio::{servo, get_servo_pulsewidth};
 use crate::state::State;
 use std::env;
+use std::time::Duration;
 
 pub struct Pwm {
     rov_up1: u32,
@@ -66,6 +67,8 @@ fn print_state(state: &State) {
 
     let mode = if state.special.mode { "ON" } else { "OFF" };
 
+    let pwm = get_servo_pulsewidth(13).to_string();
+
     println!("{}", yellow("|-------------------------------|"));
 
     println!("Left Joystick:  {}", cyan(&left_j));
@@ -73,6 +76,7 @@ fn print_state(state: &State) {
     println!("DPad:           {}", cyan(&dpad));
     println!("Face Buttons:   {}", cyan(&face));
     println!("Special Mode:   {}", cyan(&mode));
+    println!("PWM:            {}", cyan(&pwm));
 
     println!("{}", yellow("|-------------------------------|"));
 }
@@ -80,7 +84,7 @@ fn print_state(state: &State) {
 impl Pwm {
     pub async fn new() -> Self {
         Self {
-            rov_up1: 17,
+            rov_up1: 13,
             rov_up2: 27,
             rov_m1: 5,
             rov_m2: 6,
@@ -113,6 +117,8 @@ impl Pwm {
         for pin in pins {
             servo(pin, 1500);
         }
+
+        tokio::time::sleep(Duration::from_millis(10000)).await
     }
 
     async fn esc(&self, state: &State, consts: &ROVConstant) {
@@ -126,6 +132,10 @@ impl Pwm {
         servo(self.rov_m2, horizontal.m2);
         servo(self.rov_m3, horizontal.m3);
         servo(self.rov_m4, horizontal.m4);
+
+        let up1 = get_servo_pulsewidth(self.rov_up1);
+
+        println!("{up1}");
     }
 
     async fn horizontal_math(&self, state: &State, consts: &ROVConstant) -> HorizontalPWM {
