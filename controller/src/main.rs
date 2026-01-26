@@ -4,45 +4,55 @@ mod state;
 mod tasks;
 
 use crate::{
-    state::{L, Quad, R, Special, State},
-    tasks::pwm::{Pwm, pwm_loop},
+    logs::{green, yellow}, state::get_default_state, tasks::pwm::{Pwm, pwm_loop}
 };
 
-use logs::{green, red};
-use std::time::Duration;
+use std::io::{self, Read};
 use tasks::gamepad::gamepad_loop;
-use tokio::{spawn, sync::watch, task::spawn_blocking};
+use tokio::{signal, spawn, sync::watch, task};
 
 #[tokio::main]
 async fn main() {
+    let banner = include_str!("assets/banner.txt");
+    println!("{banner}");
+
     let pwm = Pwm::new().await;
     pwm.init().await;
 
-    let l = L { lx: 0.0, ly: 0.0 };
-    let r = R { rx: 0.0, ry: 0.0 };
-    let spec_default = Special {
-        mode: false,
-    };
-    let quad_default = Quad {
-        up: false,
-        down: false,
-        left: false,
-        right: false,
-    };
-
-    let state = State {
-        l,
-        r,
-        dpad: quad_default,
-        face: quad_default,
-        special: spec_default,
-    };
+    let state = get_default_state().await;
     let (sender, reciever) = watch::channel(state);
 
-    let _gamepad_task = spawn(gamepad_loop(sender));
-    let _pwm_task = spawn(pwm_loop(pwm, reciever));
+    let gamepad_task = spawn(gamepad_loop(sender));
+    let pwm_task = spawn(pwm_loop(pwm, reciever));
 
-    loop {
-        tokio::time::sleep(Duration::from_secs(60)).await;
-    }
+    let quit_task = task::spawn_blocking(|| {
+        let stdin = io::stdin();
+        for byte in stdin.bytes() {
+            if let Ok(b'q') = byte {
+                break;
+            }
+        }
+    });
+
+    quit_task.await.unwrap();
+
+    handle_shutdown(gamepad_task, pwm_task);
+}
+
+fn handle_shutdown(
+    gamepad_task: tokio::task::JoinHandle<()>,
+    pwm_task: tokio::task::JoinHandle<()>,
+) {
+    println!("\n {}", yellow("Quitting ROV controller..."));
+    
+    pigpio::terminate();
+    println!("\n {}", green("PiGPIO terminated"));
+    
+    gamepad_task.abort();
+    println!("\n {}", green("Gamepad loop terminated"));
+
+    pwm_task.abort();
+    println!("\n {}", green("PWM bridge terminated"));
+
+    println!("\n {}", yellow("ROV controller exit complete."));
 }

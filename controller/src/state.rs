@@ -32,3 +32,27 @@ pub struct Quad {
 pub struct Special {
     pub mode: bool,
 }
+
+pub async fn get_default_state() -> State {
+        let l = L { lx: 0.0, ly: 0.0 };
+    let r = R { rx: 0.0, ry: 0.0 };
+    let spec_default = Special {
+        mode: false,
+    };
+    let quad_default = Quad {
+        up: false,
+        down: false,
+        left: false,
+        right: false,
+    };
+
+    let state = State {
+        l,
+        r,
+        dpad: quad_default,
+        face: quad_default,
+        special: spec_default,
+    };
+
+    state
+}

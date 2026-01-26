@@ -1,22 +1,10 @@
 use tokio::sync::watch;
 
-use crate::logs::{green, red};
+use crate::logs::{cyan, green, red, yellow};
 use crate::pigpio;
 use crate::pigpio::servo;
 use crate::state::State;
-
-pub async fn pwm_loop(pwm: Pwm,reciever: watch::Receiver<State>) {
-    let mut rec = reciever.clone();
-    
-
-    loop {
-        rec.changed().await.unwrap();
-        let state = *rec.borrow();
-        pwm.esc(&state).await;
-
-        println!("{state:?}")
-    }
-}
+use std::env;
 
 pub struct Pwm {
     rov_up1: u32,
@@ -25,7 +13,68 @@ pub struct Pwm {
     rov_m2: u32,
     rov_m3: u32,
     rov_m4: u32,
-    stop: u32,
+}
+
+struct HorizontalPWM {
+    m1: u32,
+    m2: u32,
+    m3: u32,
+    m4: u32,
+}
+
+struct ROVConstant {
+    neutral: i32,
+    normal: i32,
+    mini: i32,
+}
+
+pub async fn pwm_loop(pwm: Pwm, reciever: watch::Receiver<State>) {
+    let mut rec = reciever.clone();
+
+    let consts = ROVConstant {
+        neutral: 1500,
+        normal: 200,
+        mini: 400,
+    };
+
+    let is_production = env::var("PRODUCTION").map(|v| v == "true").unwrap_or(false);
+
+    loop {
+        rec.changed().await.unwrap();
+        let state = *rec.borrow();
+        pwm.esc(&state, &consts).await;
+
+        if !is_production {
+            print_state(&state);
+        }
+    }
+}
+
+fn print_state(state: &State) {
+    let left_j = format!("({:.2}, {:.2})", state.l.lx, state.l.ly);
+    let right_j = format!("({:.2}, {:.2})", state.r.rx, state.r.ry);
+
+    let dpad = format!(
+        "Up={} Down={} Left={} Right={}",
+        state.dpad.up, state.dpad.down, state.dpad.left, state.dpad.right
+    );
+
+    let face = format!(
+        "Up={} Down={} Left={} Right={}",
+        state.face.up, state.face.down, state.face.left, state.face.right
+    );
+
+    let mode = if state.special.mode { "ON" } else { "OFF" };
+
+    println!("{}", yellow("|-------------------------------|"));
+
+    println!("Left Joystick:  {}", cyan(&left_j));
+    println!("Right Joystick: {}", cyan(&right_j));
+    println!("DPad:           {}", cyan(&dpad));
+    println!("Face Buttons:   {}", cyan(&face));
+    println!("Special Mode:   {}", cyan(&mode));
+
+    println!("{}", yellow("|-------------------------------|"));
 }
 
 impl Pwm {
@@ -37,7 +86,6 @@ impl Pwm {
             rov_m2: 6,
             rov_m3: 19,
             rov_m4: 26,
-            stop: 1500,
         }
     }
 
@@ -67,19 +115,62 @@ impl Pwm {
         }
     }
 
-    pub async fn esc(&self, state: &State) {
-        servo(self.rov_up1, self.vertical_math(1).await);
+    async fn esc(&self, state: &State, consts: &ROVConstant) {
+        let vertical = self.vertical_math(state, consts).await;
+        let horizontal = self.horizontal_math(state, consts).await;
+
+        servo(self.rov_up1, vertical);
+        servo(self.rov_up2, vertical);
+
+        servo(self.rov_m1, horizontal.m1);
+        servo(self.rov_m2, horizontal.m2);
+        servo(self.rov_m3, horizontal.m3);
+        servo(self.rov_m4, horizontal.m4);
     }
 
-    async fn vertical_math(&self, motor: u8) -> u32 {
-        let mut ms = self.stop;
-        
+    async fn horizontal_math(&self, state: &State, consts: &ROVConstant) -> HorizontalPWM {
+        let ms = consts.neutral as f32;
+        let apply_mini: bool = state.special.mode;
+        let adj = if apply_mini {
+            consts.mini as f32
+        } else {
+            consts.normal as f32
+        };
+
+        let ad1 = adj * state.l.lx + adj * state.l.ly;
+        let ad2 = adj * state.l.lx - adj * state.l.ly;
+        let ad3 = adj * state.l.lx + adj * state.l.ly;
+        let ad4 = adj * state.l.lx - adj * state.l.ly;
+
+        let m1 = self.clamp((ms + ad1) as i32).await as u32;
+        let m2 = self.clamp((ms + ad2) as i32).await as u32;
+        let m3 = self.clamp((ms + ad3) as i32).await as u32;
+        let m4 = self.clamp((ms + ad4) as i32).await as u32;
+
+        HorizontalPWM { m1, m2, m3, m4 }
+    }
+
+    async fn vertical_math(&self, state: &State, consts: &ROVConstant) -> u32 {
+        let mut ms = consts.neutral;
+        let apply_mini: bool = state.special.mode;
+        let adj = if apply_mini {
+            consts.mini
+        } else {
+            consts.normal
+        };
+
+        match (state.dpad.down, state.dpad.up) {
+            (true, false) => ms -= adj,
+            (false, true) => ms += adj,
+            _ => {}
+        }
+
         let pwm = self.clamp(ms).await;
 
-        pwm
+        pwm as u32
     }
 
-    async fn clamp(&self, mut pwm: u32) -> u32 {
+    async fn clamp(&self, mut pwm: i32) -> i32 {
         if pwm < 500 {
             pwm = 500;
         }

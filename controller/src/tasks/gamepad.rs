@@ -35,7 +35,7 @@ pub async fn gamepad_loop(sender: watch::Sender<State>) {
 
 
     for (_id, gamepad) in gil.gamepads() {
-        println!("{} is {:?}", gamepad.name(), gamepad.power_info());
+        println!("\x1b[32m{} is {:?}\x1b[0m", gamepad.name(), gamepad.power_info());
     }
 
     loop {
@@ -51,10 +51,11 @@ pub async fn gamepad_loop(sender: watch::Sender<State>) {
                         Button::DPadDown => state.dpad.down = true,
                         Button::DPadLeft => state.dpad.left = true,
                         Button::DPadRight => state.dpad.right = true,
-                        Button::Mode => state.special.mode = true,
+                        Button::Mode => state.special.mode = !state.special.mode,
                         _ => println!("Pressed unknown button: {:?}", button),
                     }
                 }
+
                 EventType::ButtonReleased(button, _) => {
                     match button {
                         Button::North => state.face.up = false,
@@ -65,7 +66,7 @@ pub async fn gamepad_loop(sender: watch::Sender<State>) {
                         Button::DPadDown => state.dpad.down = false,
                         Button::DPadLeft => state.dpad.left = false,
                         Button::DPadRight => state.dpad.right = false,
-                        Button::Mode => state.special.mode = false,
+                        Button::Mode => {},
                         _ => println!("Released unknown button: {:?}", button),
                     }
                 }
