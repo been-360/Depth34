@@ -22,7 +22,7 @@ impl ArduinoBridge {
         Ok(())
     }
 
-    pub fn send_joystick(&mut self, axis: char, ) {
+    pub fn _send_joystick(&mut self, _axis: char, ) {
 
     }
 }
