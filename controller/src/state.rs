@@ -34,7 +34,7 @@ pub struct Special {
 }
 
 pub async fn get_default_state() -> State {
-        let l = L { lx: 0.0, ly: 0.0 };
+    let l = L { lx: 0.0, ly: 0.0 };
     let r = R { rx: 0.0, ry: 0.0 };
     let spec_default = Special {
         mode: false,

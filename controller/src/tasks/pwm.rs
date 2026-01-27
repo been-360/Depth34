@@ -1,11 +1,13 @@
 use tokio::sync::watch;
 
+use crate::config::{load_config};
 use crate::logs::{cyan, green, red, yellow};
 use crate::pigpio;
 use crate::pigpio::{servo, get_servo_pulsewidth};
 use crate::state::State;
 use std::env;
 use std::time::Duration;
+
 
 pub struct Pwm {
     rov_up1: u32,
@@ -32,10 +34,12 @@ struct ROVConstant {
 pub async fn pwm_loop(pwm: Pwm, reciever: watch::Receiver<State>) {
     let mut rec = reciever.clone();
 
+    let config = load_config().await;
+
     let consts = ROVConstant {
-        neutral: 1500,
-        normal: 200,
-        mini: 400,
+        neutral: config.pwm.neutral,
+        normal: config.pwm.normal,
+        mini: config.pwm.mini,
     };
 
     let is_production = env::var("PRODUCTION").map(|v| v == "true").unwrap_or(false);
@@ -83,13 +87,15 @@ fn print_state(state: &State) {
 
 impl Pwm {
     pub async fn new() -> Self {
+        let config = load_config().await;
+
         Self {
-            rov_up1: 13,
-            rov_up2: 27,
-            rov_m1: 5,
-            rov_m2: 6,
-            rov_m3: 19,
-            rov_m4: 26,
+            rov_up1: config.pins.vertical_1,
+            rov_up2: config.pins.vertical_2,
+            rov_m1: config.pins.motor_1,
+            rov_m2: config.pins.motor_2,
+            rov_m3: config.pins.motor_3,
+            rov_m4: config.pins.motor_4,
         }
     }
 

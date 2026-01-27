@@ -8,11 +8,11 @@ interface CardProps {
 }
 
 function Card(props: CardProps) {
-    const w = "w-" + props.width
-    const h = "h-" + props.height
+  const w = "w-" + props.width;
+  const h = "h-" + props.height;
 
   return (
-    <div className={`${w} ${h} rounded-2xl bg-gray-100`}>
+    <div id="info-cards" className={`${w} ${h} rounded-2xl bg-black`}>
       <h1></h1>
     </div>
   );
@@ -23,11 +23,23 @@ export default function Welcome() {
     const timeline = gsap.timeline();
 
     timeline.to("#opening-text", {
-      y: -140,
+      y: -130,
       opacity: 0,
-      duration: 3,
+      duration: 2,
       ease: "power3.out",
     });
+
+    timeline.fromTo(
+      "#info-cards",
+      {
+        y: 100,
+        opacity: 0,
+      },
+      {
+        
+        opacity: 100,
+      },
+    );
   }, []);
 
   return (

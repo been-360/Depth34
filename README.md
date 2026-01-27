@@ -1,6 +1,13 @@
 # Depth34
 
-## Components
-- Gamepad Loop
-- PWM Loop
-- Arduino Bridge (contingency)
+## Checklist
+### Raspberry Pi 3B+
+- [x] Gamepad Loop 
+
+### Raspberry Pi Pico
+- [ ] PWM Loop
+
+### Common Components
+- [ ] State
+  - [X] Create State
+  - [ ] Sync State

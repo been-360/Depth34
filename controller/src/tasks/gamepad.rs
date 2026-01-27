@@ -4,14 +4,16 @@ use gilrs::{Axis, Button, EventType, Gilrs};
 use tokio::sync::watch;
 
 use crate::{
-    logs::red,
-    state::{L, Quad, R, Special, State},
+    config::load_config, logs::red, state::{L, Quad, R, Special, State}
 };
 
 pub async fn gamepad_loop(sender: watch::Sender<State>) {
     let mut axes = std::collections::HashMap::new();
     let mut gil = Gilrs::new().unwrap();
-    const DEADZONE: f32 = 0.05;
+
+    let config = load_config().await;
+
+    let deadzone: f32 = config.gamepad.joystick_deadzone;
 
     let mut state = State {
         l: L { lx: 0.0, ly: 0.0 },
@@ -78,10 +80,10 @@ pub async fn gamepad_loop(sender: watch::Sender<State>) {
                     state.r.rx = *axes.get(&Axis::RightStickX).unwrap_or(&0.0);
                     state.r.ry = *axes.get(&Axis::RightStickY).unwrap_or(&0.0);
 
-                    state.l.lx = if state.l.lx.abs() < DEADZONE { 0.0 } else { state.l.lx };
-                    state.l.ly = if state.l.ly.abs() < DEADZONE { 0.0 } else { state.l.ly };
-                    state.r.rx = if state.r.rx.abs() < DEADZONE { 0.0 } else { state.r.rx };
-                    state.r.ry = if state.r.ry.abs() < DEADZONE { 0.0 } else { state.r.ry };
+                    state.l.lx = if state.l.lx.abs() < deadzone { 0.0 } else { state.l.lx };
+                    state.l.ly = if state.l.ly.abs() < deadzone { 0.0 } else { state.l.ly };
+                    state.r.rx = if state.r.rx.abs() < deadzone { 0.0 } else { state.r.rx };
+                    state.r.ry = if state.r.ry.abs() < deadzone { 0.0 } else { state.r.ry };
                 }
 
                 _ => {}

@@ -1,18 +1,14 @@
-mod logs;
+mod config;
 mod pigpio;
 mod state;
 mod tasks;
+mod logs;
 
 use crate::{
-    logs::{green, yellow},
-    state::get_default_state,
-    tasks::pwm::{Pwm, pwm_loop},
+    config::{ensure_config}, logs::{green, yellow}, state::get_default_state, tasks::pwm::{Pwm, pwm_loop}
 };
 
-use std::{
-    io::{self, Read},
-    time::Duration,
-};
+use std::io::{self, Read};
 use tasks::gamepad::gamepad_loop;
 use tokio::{spawn, sync::watch, task};
 
@@ -21,10 +17,10 @@ async fn main() {
     let banner = include_str!("assets/banner.txt");
     println!("{banner}");
 
+    ensure_config().await;
+
     let pwm = Pwm::new().await;
     pwm.init().await;
-
-    pigpio::servo(13, 1700);
 
     let state = get_default_state().await;
     let (sender, reciever) = watch::channel(state);

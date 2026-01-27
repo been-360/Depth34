@@ -1,3 +1,4 @@
+import { ExpoScaleEase } from "gsap/EasePack";
 import gsap from "gsap";
 import { useEffect } from "react";
 import "./fonts.css";
@@ -12,7 +13,7 @@ function Card(props: CardProps) {
   const h = "h-" + props.height;
 
   return (
-    <div id="info-cards" className={`${w} ${h} rounded-2xl bg-gray-100`}>
+    <div id="info-cards" className={`${w} ${h} rounded-2xl bg-gray-200 opacity-0`}>
       <h1></h1>
     </div>
   );
@@ -21,23 +22,22 @@ function Card(props: CardProps) {
 export default function Welcome() {
   useEffect(() => {
     const timeline = gsap.timeline();
+    gsap.registerPlugin(ExpoScaleEase)
 
     timeline.to("#opening-text", {
       y: -140,
       opacity: 0,
-      duration: 3,
-     ease: "expoScale(0.5,7,none)",
-  
+      duration: 2,
+      ease: "expoScale(0.5,7,none)",
     });
 
-    timeline.fromTo(
+    timeline.to(
       "#info-cards",
-      { opacity: 0 },
       {
         y: -140,
         opacity: 100,
-        duration: 3,
-        ease: "bounce.in",
+        duration: 1,
+        ease: "back.out",
       },
     );
   }, []);
@@ -47,11 +47,15 @@ export default function Welcome() {
       <div className="fixed bg-blue-300 -top-20 -left-20 w-100 h-150 rounded-full blur-[990px]" />
       <div className="fixed bg-emerald-500 -bottom-10 -right-10 w-70 h-70 rounded-full blur-[990px]" />
 
-      <h1 id="opening-text" className="fixed top-1/2 text-2xl varela">
+      <h1 id="opening-text" className="fixed top-1/2 mt-10 text-2xl varela">
         Welcome to Depth34 Reflect
       </h1>
 
-      <div className="grid grid-cols-4">
+      <div className="grid grid-cols-4 gap-5">
+        <Card width={"50"} height={"50"} />
+        <Card width={"50"} height={"50"} />
+        <Card width={"50"} height={"50"} />
+        <Card width={"50"} height={"50"} />
       </div>
     </section>
   );

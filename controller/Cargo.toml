@@ -6,4 +6,6 @@ edition = "2024"
 [dependencies]
 apigpio = "1.0.1"
 gilrs = "0.11.1"
+serde = { version = "1.0.228", features = ["derive"] }
 tokio = { version = "1.49.0", features = ["full"] }
+toml = "0.9.11"
