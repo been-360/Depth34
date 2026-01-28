@@ -1,9 +1,9 @@
 [package]
-name = "pico-firmware"
+name = "arduino-firmware"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 embedded-hal = "1.0.0"
 panic-halt = "1.0.0"
-rp2040-hal = "0.11.0"
+avr-hal = { git = "https://github.com/Rahix/avr-hal.git", package = "arduino-hal" }

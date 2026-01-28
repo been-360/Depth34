@@ -1,0 +1,34 @@
+[package]
+name = "arduino-firmware"
+version = "0.1.0"
+authors = ["Shay <shay.mittal1@gmail.com>"]
+edition = "2021"
+license = "Apache-2.0"
+
+[[bin]]
+name = "arduino-firmware"
+test = false
+bench = false
+
+[dependencies]
+panic-halt = "1.0.0"
+ufmt = "0.2.0"
+nb = "1.1.0"
+embedded-hal = "1.0"
+
+[dependencies.arduino-hal]
+git = "https://github.com/rahix/avr-hal"
+rev = "e5c8f37fe48419956e722490a82b9ca9b9fc61a2"
+features = ["arduino-mega2560"]
+
+[profile.dev]
+panic = "abort"
+lto = true
+opt-level = "s"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+debug = true
+lto = true
+opt-level = "s"

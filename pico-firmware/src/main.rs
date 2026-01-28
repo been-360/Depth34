@@ -3,4 +3,8 @@
 
 use panic_halt as _;
 
-use rp2040_hal as hal;
+fn main() -> ! {
+    loop {
+
+    }
+}

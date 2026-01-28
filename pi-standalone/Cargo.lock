@@ -69,17 +69,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 
 [[package]]
-name = "controller"
-version = "0.1.0"
-dependencies = [
- "apigpio",
- "gilrs",
- "serde",
- "tokio",
- "toml",
-]
-
-[[package]]
 name = "crossbeam-queue"
 version = "0.3.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -418,6 +407,17 @@ dependencies = [
  "redox_syscall",
  "smallvec",
  "windows-link",
+]
+
+[[package]]
+name = "pi-standalone"
+version = "0.1.0"
+dependencies = [
+ "apigpio",
+ "gilrs",
+ "serde",
+ "tokio",
+ "toml",
 ]
 
 [[package]]
