@@ -4,7 +4,7 @@
 ### Raspberry Pi 3B+
 - [x] Gamepad Loop 
 
-### Raspberry Pi Pico
+### Arduino Mega 2560
 - [ ] PWM Loop
 
 ### Common Components
