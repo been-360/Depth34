@@ -26,3 +26,35 @@ impl ArduinoBridge {
 
     }
 }
+
+/*
+
+use std::time::Duration;
+
+use serialport::SerialPort;
+use tokio::sync::mpsc::Receiver;
+
+use crate::state::State;
+
+pub struct Bridge {
+    pub port: Box<dyn SerialPort>,
+}
+
+impl Bridge {
+    pub fn new(path: &str, baud_rate: u32) -> Self {
+        let port = serialport::new(path, baud_rate)
+            .timeout(Duration::from_millis(1000))
+            .open()
+            .expect("Failed to connect to Arduino");
+        Self { port }
+    }
+
+    pub fn run(&self, mut rx: Receiver<State>) {
+        while let Some(state) = rx.blocking_recv() {
+            
+        }
+    }
+
+    pub async fn sync_state(&self, state: &State) {}
+}
+*/

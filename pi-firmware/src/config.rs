@@ -8,6 +8,12 @@ pub struct Config {
     pub pins: PinConfig,
     pub pwm: PWMConfig,
     pub gamepad: GamepadConfig,
+    pub bridge: BridgeConfig
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct BridgeConfig {
+    pub path: String
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -50,8 +56,12 @@ pub async fn default_conf() -> Config {
     let default_gamepad = GamepadConfig {
         joystick_deadzone: 0.05,
     };
+    let default_bridge = BridgeConfig {
+        path: "/dev/ttyACM0".into()
+    };
 
     Config {
+        bridge: default_bridge,
         title: title,
         pwm: default_pwm,
         pins: default_pins,

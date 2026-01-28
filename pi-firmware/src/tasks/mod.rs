@@ -1,2 +1,2 @@
 pub mod gamepad;
-pub mod bridge;
+pub mod pwm;
