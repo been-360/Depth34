@@ -4,7 +4,7 @@
 use arduino_hal::simple_pwm::*;
 use panic_halt as _;
 
-fn init_timer() {
+fn init_timer(tc1: arduino_hal::pac::TC1) {
     
 }
 

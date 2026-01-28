@@ -1,0 +1,17 @@
+title = "ROV Config"
+
+[pins]
+vertical_1 = 13
+vertical_2 = 27
+motor_1 = 5
+motor_2 = 6
+motor_3 = 19
+motor_4 = 26
+
+[pwm]
+neutral = 1500
+normal = 200
+mini = 50
+
+[gamepad]
+joystick_deadzone = 0.05
