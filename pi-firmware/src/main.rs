@@ -13,7 +13,11 @@ use crate::{
 
 use std::io::{self, Read};
 use tasks::gamepad::gamepad_loop;
-use tokio::{spawn, sync::watch, task, task::spawn_blocking};
+use tokio::{
+    spawn,
+    sync::watch,
+    task::{self, spawn_blocking},
+};
 
 #[tokio::main]
 async fn main() {
@@ -29,7 +33,6 @@ async fn main() {
     let (sender, receiver) = watch::channel(state);
 
     let gamepad_task = spawn(gamepad_loop(sender));
-
     let pwm_task = spawn_blocking(move || {
         let rt = tokio::runtime::Handle::current();
         rt.block_on(pwm_loop(pwm, receiver));

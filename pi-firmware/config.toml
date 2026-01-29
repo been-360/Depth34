@@ -1,0 +1,20 @@
+title = "ROV Config"
+
+[pins]
+vertical_1 = 8
+vertical_2 = 9
+motor_1 = 4
+motor_2 = 5
+motor_3 = 6
+motor_4 = 7
+
+[pwm]
+neutral = 1500
+normal = 200
+mini = 50
+
+[gamepad]
+joystick_deadzone = 0.05
+
+[bridge]
+path = "/dev/ttyACM0"
