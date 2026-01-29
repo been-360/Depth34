@@ -2,7 +2,7 @@ use tokio::sync::watch;
 
 use crate::bridge::Bridge;
 use crate::config::load_config;
-use crate::logs::{cyan, yellow};
+use crate::logs::{cyan, green, yellow};
 use crate::state::State;
 use std::env;
 use std::time::Duration;
@@ -90,10 +90,12 @@ impl Pwm {
         let neutral = config.pwm.neutral as u16;
 
         let pwm_vals: [u16; 6] = [neutral, neutral, neutral, neutral, neutral, neutral];
-
+        
         self.bridge.servo(&pwm_vals);
+        println!("{}", yellow("Priming..."));
 
-        tokio::time::sleep(Duration::from_millis(5000)).await
+        tokio::time::sleep(Duration::from_millis(5000)).await;
+        println!("{}", green("Primed"));
     }
 
     async fn esc(&mut self, state: &State, consts: &ROVConstant) {

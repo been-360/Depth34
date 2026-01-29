@@ -23,12 +23,12 @@ pub struct GamepadConfig {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PinConfig {
-    pub vertical_1: u32,
-    pub vertical_2: u32,
-    pub motor_1: u32,
-    pub motor_2: u32,
-    pub motor_3: u32,
-    pub motor_4: u32,
+    pub vertical_1: u8,
+    pub vertical_2: u8,
+    pub motor_1: u8,
+    pub motor_2: u8,
+    pub motor_3: u8,
+    pub motor_4: u8,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -41,12 +41,12 @@ pub struct PWMConfig {
 pub async fn default_conf() -> Config {
     let title = "ROV Config".to_string();
     let default_pins = PinConfig {
-        vertical_1: 13,
-        vertical_2: 27,
-        motor_1: 5,
-        motor_2: 6,
-        motor_3: 19,
-        motor_4: 26,
+        motor_1: 4,
+        motor_2: 5,
+        motor_3: 6,
+        motor_4: 7,
+        vertical_1: 8,
+        vertical_2: 9,
     };
     let default_pwm = PWMConfig {
         neutral: 1500,
